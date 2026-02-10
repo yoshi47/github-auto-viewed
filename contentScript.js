@@ -11,10 +11,28 @@
 
   // ---- Rule matching ----
 
+  let activePatterns = [];
+
+  const globToRegex = (pattern) => {
+    const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`^${escaped.replace(/\*/g, ".*")}$`);
+  };
+
   const shouldAutoView = (path) =>
-    path.includes("/gen/") ||
-    path.endsWith("openapi.gen.d.ts") ||
-    path.endsWith("swagger.json");
+    activePatterns.some((p) => globToRegex(p).test(path));
+
+  const loadPatterns = (callback) => {
+    chrome.storage.sync.get({ patterns: [] }, (result) => {
+      activePatterns = result.patterns;
+      if (callback) callback();
+    });
+  };
+
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.patterns) {
+      activePatterns = changes.patterns.newValue || [];
+    }
+  });
 
   // ---- DOM helpers ----
 
@@ -210,8 +228,10 @@
     // Reset queue state for SPA navigations
     clickQueue = [];
     isProcessingQueue = false;
-    scanFiles();
-    waitForFilesContainer();
+    loadPatterns(() => {
+      scanFiles();
+      waitForFilesContainer();
+    });
   };
 
   // ---- SPA navigation support ----

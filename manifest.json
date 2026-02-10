@@ -1,18 +1,32 @@
 {
   "manifest_version": 3,
   "name": "GitHub Auto Viewed (Generated Files)",
-  "version": "0.2.0",
-  "description": "Automatically mark generated files as Viewed on GitHub PRs.",
-  "permissions": ["storage"],
+  "version": "0.3.0",
+  "description": "Automatically mark generated files as Viewed on GitHub PRs. Patterns are customizable.",
+  "permissions": [
+    "storage"
+  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
   "content_scripts": [
     {
-      "matches": ["https://github.com/*/*/pull/*"],
-      "js": ["contentScript.js"],
+      "matches": [
+        "https://github.com/*/*/pull/*"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
       "run_at": "document_idle"
     }
   ]
