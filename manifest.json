@@ -1,8 +1,14 @@
 {
   "manifest_version": 3,
   "name": "GitHub Auto Viewed (Generated Files)",
-  "version": "0.1.0",
-  "description": "Automatically mark generated files as Viewed on GitHub PRs (/gen/, openapi.gen.d.ts, swagger.json)",
+  "version": "0.2.0",
+  "description": "Automatically mark generated files as Viewed on GitHub PRs.",
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "content_scripts": [
     {
       "matches": ["https://github.com/*/*/pull/*"],
