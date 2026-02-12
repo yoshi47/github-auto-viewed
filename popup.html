@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <style>
     body {
-      width: 320px;
+      width: 360px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       font-size: 13px;
       padding: 12px;
@@ -19,6 +19,59 @@
       margin: 0 0 8px;
       color: #57606a;
       font-size: 12px;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #d0d7de;
+      margin-bottom: 12px;
+    }
+    .tab {
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      background: none;
+      color: #57606a;
+      margin-bottom: -1px;
+    }
+    .tab:hover {
+      color: #24292f;
+    }
+    .tab.active {
+      color: #24292f;
+      background: #fff;
+      border-color: #d0d7de;
+      border-bottom-color: #fff;
+    }
+    .tab.disabled {
+      color: #8c959f;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .repo-name {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 12px;
+      color: #0969da;
+      background: #ddf4ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .disabled-message {
+      color: #8c959f;
+      font-size: 12px;
+      font-style: italic;
+      padding: 16px 0;
     }
     textarea {
       width: 100%;
@@ -41,27 +94,19 @@
       gap: 8px;
       margin-top: 8px;
     }
-    button {
+    .save-btn {
       padding: 5px 12px;
       font-size: 12px;
       border-radius: 6px;
-      border: 1px solid #d0d7de;
+      border: 1px solid #2da44e;
       cursor: pointer;
-      background: #f6f8fa;
-      color: #24292f;
-    }
-    button:hover {
-      background: #eaeef2;
-    }
-    #save {
       background: #2da44e;
       color: #fff;
-      border-color: #2da44e;
     }
-    #save:hover {
+    .save-btn:hover {
       background: #298e46;
     }
-    #status {
+    .status {
       margin-top: 8px;
       font-size: 12px;
       color: #2da44e;
@@ -71,12 +116,35 @@
 </head>
 <body>
   <h3>Auto-Viewed Patterns</h3>
-  <p>One glob pattern per line. Use <code>*</code> as wildcard.</p>
-  <textarea id="patterns" spellcheck="false" placeholder="e.g.&#10;*/gen/*&#10;*openapi.gen.d.ts&#10;*swagger.json"></textarea>
-  <div class="buttons">
-    <button id="save">Save</button>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="repo" id="repo-tab">Repository</button>
+    <button class="tab" data-tab="global">Global</button>
   </div>
-  <div id="status"></div>
+
+  <div id="panel-repo" class="tab-panel active">
+    <div id="repo-active">
+      <p>Patterns applied only to <span id="repo-name-display" class="repo-name"></span></p>
+      <textarea id="repo-patterns" spellcheck="false" placeholder="e.g.&#10;src/generated/*&#10;*.pb.go"></textarea>
+      <div class="buttons">
+        <button class="save-btn" id="save-repo">Save</button>
+      </div>
+      <div class="status" id="status-repo"></div>
+    </div>
+    <div id="repo-disabled" style="display:none;">
+      <p class="disabled-message">Open a GitHub Pull Request page to configure repository-specific patterns.</p>
+    </div>
+  </div>
+
+  <div id="panel-global" class="tab-panel">
+    <p>Patterns applied to <strong>all repositories</strong>. One glob per line.</p>
+    <textarea id="global-patterns" spellcheck="false" placeholder="e.g.&#10;*/gen/*&#10;*.lock"></textarea>
+    <div class="buttons">
+      <button class="save-btn" id="save-global">Save</button>
+    </div>
+    <div class="status" id="status-global"></div>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
   "name": "GitHub Auto Viewed (Generated Files)",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Automatically mark generated files as Viewed on GitHub PRs. Patterns are customizable.",
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab"
   ],
   "icons": {
     "16": "icons/icon16.png",

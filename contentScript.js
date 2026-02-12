@@ -9,6 +9,25 @@
   let clickQueue = [];
   let isProcessingQueue = false;
 
+  // ---- Migration ----
+
+  const migrateStorage = (callback) => {
+    chrome.storage.sync.get(null, (data) => {
+      if (data.schemaVersion >= 1) {
+        callback();
+        return;
+      }
+      const migrated = {
+        schemaVersion: 1,
+        globalPatterns: data.patterns || [],
+        repoPatterns: data.repoPatterns || {},
+      };
+      chrome.storage.sync.remove("patterns", () => {
+        chrome.storage.sync.set(migrated, callback);
+      });
+    });
+  };
+
   // ---- Rule matching ----
 
   let activePatterns = [];
@@ -21,16 +40,25 @@
   const shouldAutoView = (path) =>
     activePatterns.some((p) => globToRegex(p).test(path));
 
+  const getOwnerRepo = () => {
+    const match = location.pathname.match(/^\/([^/]+\/[^/]+)/);
+    return match ? match[1] : null;
+  };
+
   const loadPatterns = (callback) => {
-    chrome.storage.sync.get({ patterns: [] }, (result) => {
-      activePatterns = result.patterns;
-      if (callback) callback();
+    migrateStorage(() => {
+      chrome.storage.sync.get({ globalPatterns: [], repoPatterns: {} }, (result) => {
+        const ownerRepo = getOwnerRepo();
+        const repoSpecific = ownerRepo ? (result.repoPatterns[ownerRepo] || []) : [];
+        activePatterns = [...result.globalPatterns, ...repoSpecific];
+        if (callback) callback();
+      });
     });
   };
 
   chrome.storage.onChanged.addListener((changes) => {
-    if (changes.patterns) {
-      activePatterns = changes.patterns.newValue || [];
+    if (changes.globalPatterns || changes.repoPatterns) {
+      loadPatterns();
     }
   });
 
