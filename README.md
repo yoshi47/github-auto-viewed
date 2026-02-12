@@ -1,7 +1,5 @@
 # GitHub Auto Viewed (Generated Files)
 
----
-
 ## English
 
 A Chrome extension that automatically marks generated files as "Viewed" on GitHub PR's Files changed page. Works on both Files changed and Changes tabs.
