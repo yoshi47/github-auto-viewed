@@ -12,7 +12,7 @@ manifest.json
         "id": "4c70dd40-7214-48ef-b0af-6ddd63af8523",
         "model": "claude-opus-4-6"
       },
-      "human_author": "Yoshiki Kadono <yoshiki.kadono@meetsmore.com>",
+      "human_author": "kururu <kururu6966@gmail.com>",
       "messages": [],
       "total_additions": 4,
       "total_deletions": 2,
