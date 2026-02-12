@@ -1,0 +1,29 @@
+manifest.json
+  b86a3350b42e034c 4,7-8
+popup.html
+  b86a3350b42e034c 7,23-75,97,101,106,109,119-128,130-145,147
+popup.js
+  b86a3350b42e034c 4,6-44,46-54,57-64,66-67,70-73,77,79-81,85-89,92-93,95-98,102-142
+contentScript.js
+  b86a3350b42e034c 12-30,43-46,49-55,60-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "a7baa954e215d465608f8f89b390fae0596dd91f",
+  "prompts": {
+    "b86a3350b42e034c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c70dd40-7214-48ef-b0af-6ddd63af8523",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Yoshiki Kadono <yoshiki.kadono@meetsmore.com>",
+      "messages": [],
+      "total_additions": 263,
+      "total_deletions": 55,
+      "accepted_lines": 249,
+      "overriden_lines": 0
+    }
+  }
+}
