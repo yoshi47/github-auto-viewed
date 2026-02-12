@@ -4,8 +4,10 @@
   "version": "0.4.0",
   "description": "Automatically mark generated files as Viewed on GitHub PRs. Patterns are customizable.",
   "permissions": [
-    "storage",
-    "activeTab"
+    "storage"
+  ],
+  "host_permissions": [
+    "https://github.com/*"
   ],
   "icons": {
     "16": "icons/icon16.png",
