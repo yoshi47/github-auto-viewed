@@ -1,0 +1,23 @@
+manifest.json
+  b86a3350b42e034c 8-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.1",
+  "base_commit_sha": "2461b553c917d5c19d14d306c508365dc24e5224",
+  "prompts": {
+    "b86a3350b42e034c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4c70dd40-7214-48ef-b0af-6ddd63af8523",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Yoshiki Kadono <yoshiki.kadono@meetsmore.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 2,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
