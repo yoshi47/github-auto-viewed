@@ -1,0 +1,23 @@
+README.md
+  159cb7a446b3bfcb 3,5,7,9-13,19-21,23-28,31,38,47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.2",
+  "base_commit_sha": "58c6e2708db96f72e7f6e70a90c331d2d04383b4",
+  "prompts": {
+    "159cb7a446b3bfcb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0648c2bd-e489-418a-8760-6bc762ce723c",
+        "model": "composer-1.5"
+      },
+      "human_author": "kururu <kururu6966@gmail.com>",
+      "messages": [],
+      "total_additions": 22,
+      "total_deletions": 10,
+      "accepted_lines": 22,
+      "overriden_lines": 0
+    }
+  }
+}
