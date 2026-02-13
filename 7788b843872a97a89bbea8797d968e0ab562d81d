@@ -1,0 +1,23 @@
+README.md
+  527a1d780edc7086 23-24,27,72-73,75-76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.3",
+  "base_commit_sha": "7788b843872a97a89bbea8797d968e0ab562d81d",
+  "prompts": {
+    "527a1d780edc7086": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27df7979-dc29-48d5-91fc-f6f365e0bc15",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "kururu <kururu6966@gmail.com>",
+      "messages": [],
+      "total_additions": 13,
+      "total_deletions": 1,
+      "accepted_lines": 9,
+      "overriden_lines": 0
+    }
+  }
+}
