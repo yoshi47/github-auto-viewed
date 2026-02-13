@@ -20,7 +20,11 @@ Click the extension icon to open the popup and edit the auto-viewed patterns.
 
 **Global tab:** Patterns applied to all repositories.
 
+![Global tab](images/popup-global.png)
+
 **Repository tab:** Patterns applied only to the current repository (the PR page you have open). If you open the popup from a non-PR page, you'll see "Open a GitHub Pull Request page to configure repository-specific patterns."
+
+![Repository tab](images/popup-repository.png)
 
 **Common:**
 - One pattern per line
@@ -65,7 +69,11 @@ GitHub PRの「Files changed」画面で、生成ファイルを自動的に「V
 
 **Global タブ:** 全リポジトリに適用されるパターンを設定します。
 
-**Repository タブ:** 現在開いている GitHub PR のリポジトリにのみ適用されるパターンを設定します。PR ページ以外でポップアップを開いた場合は「Open a GitHub Pull Request page to configure...」と表示され、設定できません。
+![Global タブ](images/popup-global.png)
+
+**Repository タブ:** 現在開いている GitHub PR のリポジトリにのみ適用されるパターンを設定します。
+
+![Repository タブ](images/popup-repository.png)PR ページ以外でポップアップを開いた場合は「Open a GitHub Pull Request page to configure...」と表示され、設定できません。
 
 **共通:**
 - 1行に1パターン
