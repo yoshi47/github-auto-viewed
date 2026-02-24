@@ -4,10 +4,16 @@
   const CLICK_INTERVAL_MS = 100;
   const FILES_CONTAINER_POLL_MS = 500;
   const FILES_CONTAINER_POLL_TIMEOUT_MS = 10000;
+  const RETRY_SCAN_DELAY_MS = 200;
 
-  const processed = new WeakSet();
+  let processed = new WeakSet();
+  let retryCount = new WeakMap();
+  const MAX_RETRIES = 10;
   let clickQueue = [];
   let isProcessingQueue = false;
+
+  let retryScanTimerId = null;
+  let drainTimerId = null;
 
   // ---- Migration ----
 
@@ -32,14 +38,6 @@
 
   let activePatterns = [];
 
-  const globToRegex = (pattern) => {
-    const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&");
-    return new RegExp(`^${escaped.replace(/\*/g, ".*")}$`);
-  };
-
-  const shouldAutoView = (path) =>
-    activePatterns.some((p) => globToRegex(p).test(path));
-
   const getOwnerRepo = () => {
     const match = location.pathname.match(/^\/([^/]+\/[^/]+)/);
     return match ? match[1] : null;
@@ -62,59 +60,6 @@
     }
   });
 
-  // ---- DOM helpers ----
-
-  /** Strip invisible Unicode markers (e.g. LRM \u200e) that GitHub injects. */
-  const cleanText = (text) =>
-    text.replace(/[\u200e\u200f\u200b\u200c\u200d\ufeff]/g, "").trim();
-
-  /**
-   * Extract the file path from a diff block.
-   * New UI (2025+): <a class="Link--primary"> inside an <h3> with CSS-module class.
-   * Legacy UI:      <a class="Link--primary"> inside .js-file / .file-header.
-   */
-  const extractFilePath = (fileEl) => {
-    const primary = fileEl.querySelector("a.Link--primary");
-    if (primary?.textContent?.includes("/")) {
-      return cleanText(primary.textContent);
-    }
-    // Legacy fallback
-    const fallback = fileEl.querySelector(".file-header a");
-    if (fallback?.textContent?.includes("/")) {
-      return cleanText(fallback.textContent);
-    }
-    // Last resort: any anchor whose text looks like a file path
-    for (const a of fileEl.querySelectorAll("a")) {
-      const t = cleanText(a.textContent);
-      if (t.includes("/") && !t.startsWith("http")) return t;
-    }
-    return null;
-  };
-
-  /**
-   * Find the "Viewed" toggle for a diff block.
-   * New UI (2025+): <button> with MarkAsViewedButton class, aria-pressed="true"/"false".
-   * Legacy UI:      <input type="checkbox" class="js-reviewed-checkbox">.
-   */
-  const findViewedToggle = (fileEl) => {
-    // New UI: button-based Viewed toggle
-    const btn = fileEl.querySelector('button[class*="MarkAsViewedButton"]');
-    if (btn) return btn;
-    // Legacy UI: checkbox-based Viewed toggle
-    return (
-      fileEl.querySelector('input.js-reviewed-checkbox[type="checkbox"]') ||
-      fileEl.querySelector('input[type="checkbox"][name="file_reviewed"]')
-    );
-  };
-
-  /** Check whether the Viewed toggle is already marked. */
-  const isAlreadyViewed = (toggle) => {
-    if (toggle.tagName === "BUTTON") {
-      return toggle.getAttribute("aria-pressed") === "true";
-    }
-    return toggle.checked; // legacy checkbox
-  };
-
   // ---- Click queue (throttled) ----
 
   const enqueueClick = (el) => {
@@ -134,7 +79,7 @@
     } catch (e) {
       console.debug("[auto-viewed] click failed:", e);
     }
-    setTimeout(drainQueue, CLICK_INTERVAL_MS);
+    drainTimerId = setTimeout(drainQueue, CLICK_INTERVAL_MS);
   };
 
   // ---- Core scan ----
@@ -153,6 +98,12 @@
   };
 
   const scanFiles = () => {
+    // Cancel any pending retry to debounce
+    if (retryScanTimerId !== null) {
+      clearTimeout(retryScanTimerId);
+      retryScanTimerId = null;
+    }
+
     const fileEls = getDiffElements();
 
     if (fileEls.length === 0 && isFilesPage()) {
@@ -162,23 +113,19 @@
       return;
     }
 
-    let marked = 0;
-    for (const fileEl of fileEls) {
-      if (processed.has(fileEl)) continue;
-      processed.add(fileEl);
+    const { clickTargets, marked, pendingRetry } = AutoViewed.scanFilesLogic(
+      fileEls, processed, retryCount, activePatterns, MAX_RETRIES
+    );
 
-      const path = extractFilePath(fileEl);
-      if (!path) continue;
-      if (!shouldAutoView(path)) continue;
-
-      const toggle = findViewedToggle(fileEl);
-      if (!toggle || isAlreadyViewed(toggle)) continue;
-
+    for (const toggle of clickTargets) {
       enqueueClick(toggle);
-      marked++;
     }
+
     if (marked > 0) {
       console.debug(`[auto-viewed] Queued ${marked} file(s) to mark as Viewed.`);
+    }
+    if (pendingRetry) {
+      retryScanTimerId = setTimeout(scanFiles, RETRY_SCAN_DELAY_MS);
     }
   };
 
@@ -253,9 +200,14 @@
   const init = () => {
     if (!isFilesPage()) return;
     console.debug("[auto-viewed] Activated on", location.href);
-    // Reset queue state for SPA navigations
+    // Cancel pending timers to prevent leaks on SPA navigation
+    if (retryScanTimerId !== null) { clearTimeout(retryScanTimerId); retryScanTimerId = null; }
+    if (drainTimerId !== null) { clearTimeout(drainTimerId); drainTimerId = null; }
+    // Reset all state for SPA navigations
     clickQueue = [];
     isProcessingQueue = false;
+    processed = new WeakSet();
+    retryCount = new WeakMap();
     loadPatterns(() => {
       scanFiles();
       waitForFilesContainer();
@@ -269,14 +221,38 @@
   document.addEventListener("pjax:end", () => init());
 
   // New React-based UI uses History API
-  window.addEventListener("popstate", () => setTimeout(init, 100));
+  let deferredTimerId = null;
+  let deferredGeneration = 0;
+  const deferredInit = () => {
+    if (deferredTimerId) clearTimeout(deferredTimerId);
+    if (!isFilesPage()) return;
+    const gen = ++deferredGeneration;
+    let attempts = 0;
+    const maxAttempts = 20; // 100ms * 20 = 2s max
+    const tryInit = () => {
+      if (gen !== deferredGeneration) return; // stale chain — abort
+      attempts++;
+      if (getDiffElements().length > 0) {
+        init();
+        return;
+      }
+      if (attempts >= maxAttempts) {
+        console.debug("[auto-viewed] deferredInit timed out — no diff elements found.");
+        return;
+      }
+      deferredTimerId = setTimeout(tryInit, 100);
+    };
+    tryInit();
+  };
+
+  window.addEventListener("popstate", () => deferredInit());
 
   // Intercept pushState/replaceState for SPA navigations that don't fire popstate
   for (const method of ["pushState", "replaceState"]) {
     const original = history[method];
     history[method] = function (...args) {
       original.apply(this, args);
-      setTimeout(init, 100);
+      deferredInit();
     };
   }
 

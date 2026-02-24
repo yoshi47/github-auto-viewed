@@ -28,6 +28,7 @@
         "https://github.com/*/*/pull/*"
       ],
       "js": [
+        "lib.js",
         "contentScript.js"
       ],
       "run_at": "document_idle"
