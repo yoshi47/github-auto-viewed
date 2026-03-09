@@ -1,4 +1,6 @@
-# GitHub Auto Viewed (Generated Files)
+<p align="center"><img src="icons/icon128.png" width="128" height="128" alt="GitHub Auto Viewed icon"></p>
+
+# GitHub Auto Viewed — Chrome Extension
 
 ## English
 
