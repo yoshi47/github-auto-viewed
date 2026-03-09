@@ -247,14 +247,18 @@
 
   window.addEventListener("popstate", () => deferredInit());
 
-  // Intercept pushState/replaceState for SPA navigations that don't fire popstate
-  for (const method of ["pushState", "replaceState"]) {
-    const original = history[method];
-    history[method] = function (...args) {
-      original.apply(this, args);
+  // URL polling: MV3 content scripts run in an isolated world, so
+  // history.pushState/replaceState interception does NOT reach the main
+  // page's JS.  GitHub's new React UI also uses the Navigation API which
+  // bypasses pushState entirely.  Polling the URL is the most reliable
+  // cross-world detection method.
+  let lastUrl = location.href;
+  let urlPollTimerId = setInterval(() => {
+    if (location.href !== lastUrl) {
+      lastUrl = location.href;
       deferredInit();
-    };
-  }
+    }
+  }, 300);
 
   // Initial run
   init();
