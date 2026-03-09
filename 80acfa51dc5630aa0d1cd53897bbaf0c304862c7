@@ -1,39 +1,7 @@
-contentScript.js
-  6601e135a6237302 250-255,257-258,261
-  fd8db9bcf0c197a8 256
-manifest.json
-  fd8db9bcf0c197a8 4
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "1.1.8",
   "base_commit_sha": "80acfa51dc5630aa0d1cd53897bbaf0c304862c7",
-  "prompts": {
-    "6601e135a6237302": {
-      "agent_id": {
-        "tool": "claude",
-        "id": "e2f3cd9d-199a-4446-aba7-3ad25d48ccab",
-        "model": "claude-opus-4-6"
-      },
-      "human_author": "kururu <kururu6966@gmail.com>",
-      "messages": [],
-      "total_additions": 11,
-      "total_deletions": 7,
-      "accepted_lines": 9,
-      "overriden_lines": 0
-    },
-    "fd8db9bcf0c197a8": {
-      "agent_id": {
-        "tool": "claude",
-        "id": "878bd98f-ec70-492f-a4a5-4ca35bb6ce75",
-        "model": "claude-opus-4-6"
-      },
-      "human_author": "kururu <kururu6966@gmail.com>",
-      "messages": [],
-      "total_additions": 2,
-      "total_deletions": 2,
-      "accepted_lines": 2,
-      "overriden_lines": 0
-    }
-  }
+  "prompts": {}
 }
