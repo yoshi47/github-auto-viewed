@@ -86,12 +86,15 @@
 
   /**
    * Collect all diff-block elements.
-   * New UI: CSS-module class containing "Diff-module__diff__"
+   * New UI: <div role="region" id="diff-…">. Not matched by class because the
+   *         CSS-module class names are hashed and have changed before.
    * Legacy: .js-file
    */
+  const DIFF_SELECTOR = '[role="region"][id^="diff-"]';
+
   const getDiffElements = () => {
     // New UI (2025+)
-    const newEls = document.querySelectorAll('[class*="Diff-module__diff__"]');
+    const newEls = document.querySelectorAll(DIFF_SELECTOR);
     if (newEls.length > 0) return newEls;
     // Legacy UI
     return document.querySelectorAll(".js-file");
@@ -151,7 +154,7 @@
     if (legacy) return legacy;
 
     // New UI: find the parent of the first diff block
-    const firstDiff = document.querySelector('[class*="Diff-module__diff__"]');
+    const firstDiff = document.querySelector(DIFF_SELECTOR);
     if (firstDiff) {
       // Walk up to the list container (the one with many diff children)
       let parent = firstDiff.parentElement;

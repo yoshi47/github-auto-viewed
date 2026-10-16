@@ -38,12 +38,16 @@ var AutoViewed = (() => {
 
   /**
    * Find the "Viewed" toggle for a diff block.
-   * New UI (2025+): <button> with MarkAsViewedButton class, aria-pressed="true"/"false".
+   * New UI (2025+): the first Primer <button data-component="Button"> with aria-pressed
+   *                 (SegmentedControl buttons also have aria-pressed but no data-component).
+   *                 Not matched by its "Viewed" label so it works regardless of
+   *                 UI language or page translation.
    * Legacy UI:      <input type="checkbox" class="js-reviewed-checkbox">.
    */
   const findViewedToggle = (fileEl) => {
     // New UI: button-based Viewed toggle
-    const btn = fileEl.querySelector('button[class*="MarkAsViewedButton"]');
+    const btn = [...fileEl.querySelectorAll('button[data-component="Button"]')]
+      .find((b) => b.getAttribute("aria-pressed") !== null);
     if (btn) return btn;
     // Legacy UI: checkbox-based Viewed toggle
     return (
