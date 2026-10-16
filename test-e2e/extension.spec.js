@@ -79,7 +79,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   // Wait for diff elements to appear
   await page.waitForSelector(
-    '[class*="Diff-module__diff__"], .js-file',
+    '[role="region"][id^="diff-"], .js-file',
     { timeout: 15000 }
   ).catch(() => {
     console.warn("Diff elements not found with primary selectors, checking page content...");
@@ -92,8 +92,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // Check results
   const results = await page.evaluate(() => {
     const diffEls =
-      document.querySelectorAll('[class*="Diff-module__diff__"]').length > 0
-        ? document.querySelectorAll('[class*="Diff-module__diff__"]')
+      document.querySelectorAll('[role="region"][id^="diff-"]').length > 0
+        ? document.querySelectorAll('[role="region"][id^="diff-"]')
         : document.querySelectorAll(".js-file");
 
     const files = [];
@@ -101,7 +101,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const linkEl = el.querySelector("a.Link--primary");
       const filePath = linkEl?.textContent?.trim() || "(unknown)";
 
-      const btn = el.querySelector('button[class*="MarkAsViewedButton"]');
+      const btn = el.querySelector('button[data-component="Button"][aria-pressed]');
       const checkbox = el.querySelector(
         'input.js-reviewed-checkbox[type="checkbox"], input[type="checkbox"][name="file_reviewed"]'
       );

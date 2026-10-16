@@ -197,7 +197,7 @@ console.log("\n== Test 2: processed.add timing — toggle missing allows retry =
 
   // Simulate toggle appearing on second scan
   const toggle = new MockElement("button", {
-    class: "MarkAsViewedButton-abc123",
+    "data-component": "Button",
     "aria-pressed": "false",
   });
   fileEl._children.push(toggle);
@@ -269,7 +269,7 @@ console.log("\n== Test 6: Already viewed — processed immediately ==");
 {
   const link = new MockElement("a", { class: "Link--primary", textContent: "src/app.ts" });
   const toggle = new MockElement("button", {
-    class: "MarkAsViewedButton-abc123",
+    "data-component": "Button",
     "aria-pressed": "true",
   });
   const fileEl = new MockElement("div", {}, [link, toggle]);
@@ -280,6 +280,17 @@ console.log("\n== Test 6: Already viewed — processed immediately ==");
   const result = scanFilesLogic([fileEl], processed, retryCount, activePatterns, 10);
   assert(processed.has(fileEl), "Already-viewed file processed immediately");
   assert(result.marked === 0, "No click enqueued for already-viewed file");
+}
+
+// ==== Test 6b: findViewedToggle ignores other pressed / Primer buttons ====
+console.log("\n== Test 6b: findViewedToggle — picks the Viewed toggle among other buttons ==");
+
+{
+  const segmented = new MockElement("button", { "aria-pressed": "true" });
+  const plainPrimer = new MockElement("button", { "data-component": "Button" });
+  const toggle = new MockElement("button", { "data-component": "Button", "aria-pressed": "false" });
+  const fileEl = new MockElement("div", {}, [segmented, plainPrimer, toggle]);
+  assert(findViewedToggle(fileEl) === toggle, "Viewed toggle selected, not SegmentedControl or plain Button");
 }
 
 // ==== Test 7: globToRegex patterns ====
@@ -303,7 +314,7 @@ console.log("\n== Test 8: State reset simulation ==");
 
   const link = new MockElement("a", { class: "Link--primary", textContent: "src/app.ts" });
   const toggle = new MockElement("button", {
-    class: "MarkAsViewedButton-abc123",
+    "data-component": "Button",
     "aria-pressed": "false",
   });
   const fileEl = new MockElement("div", {}, [link, toggle]);
